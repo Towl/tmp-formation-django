@@ -1,25 +1,25 @@
 # Sections
 
-## [ORM](orm.md)
+## [ORM](./orm.md)
 
-## [Serialization](serialization.md)
+## [Serialization](./serialization.md)
 
-## [View & Form](view_and_form.md)
+## [View & Form](./view_and_form.md)
 
-## [API](api.md)
+## [API](./api.md)
 
-## [Queue & Worker](queue_and_worker.md)
+## [Queue & Worker](./queue_and_worker.md)
 
-## [Tests](tests.md)
+## [Tests](./tests.md)
 
-## [Admin](admin.md)
+## [Admin](./admin.md)
 
-## [Templates & Front](templates_and_front.md)
+## [Templates & Front](./templates_and_front.md)
 
-## [Permission & Authentication](permissions_and_auth.md)
+## [Permission & Authentication](./permissions_and_auth.md)
 
-## [Middlewares](middlewares.md)
+## [Middlewares](./middlewares.md)
 
-## [Signals](signals.md)
+## [Signals](./signals.md)
 
-## [Commands](cmd.md)
+## [Commands](./cmd.md)
