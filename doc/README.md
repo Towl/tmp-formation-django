@@ -2,9 +2,9 @@
 
 ## [ORM](./orm.md)
 
-## [Serialization](./serialization.md)
-
 ## [View & Form](./view_and_form.md)
+
+## [Serialization](./serialization.md)
 
 ## [API](./api.md)
 
