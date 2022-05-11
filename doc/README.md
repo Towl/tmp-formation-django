@@ -4,9 +4,9 @@
 
 ## [View & Form](./view_and_form.md)
 
-## [Serialization](./serialization.md)
+## [Serialization (DRF)](./serialization.md)
 
-## [API](./api.md)
+## [API (DRF)](./api.md)
 
 ## [Queue & Worker](./queue_and_worker.md)
 
