@@ -1,0 +1,129 @@
+version: "3.8"
+
+services:
+  builder:
+    image: ptl-builder
+    build:
+      context: ./src
+      dockerfile: builder.Dockerfile
+      args:
+        env: dev
+
+  ssl:
+    build: images/reverse-https
+    ports:
+      - '80:80'
+      - '443:443'
+      - '4443:4443'
+    depends_on:
+      - nginx
+    networks:
+      ptl:
+
+  nginx:
+    image: ptl-nginx
+    build:
+      context: ./src
+      dockerfile: nginx.Dockerfile
+      args:
+        env: dev
+    container_name: ptl-nginx
+    volumes:
+      - "./mock:/srv/mock"
+    depends_on:
+      - api
+      - builder
+    networks:
+      ptl:
+        aliases:
+          - nginx
+          - front
+
+  api:
+    image: ptl-api
+    build:
+      context: ./src
+      dockerfile: api.Dockerfile
+      args:
+        env: dev
+    container_name: ptl-api
+    command: [ "python", "manage.py", "runserver", "0.0.0.0:8000"]
+    env_file:
+      - dev.env
+    volumes:
+      - "./src:/app"
+      - "./src/config:/etc/certs"
+      - "./src/config/firebase.json:/etc/firebase/firebase.json"
+      - "./src/config/gcp.json:/etc/gcloud/gcp.json"
+    depends_on:
+      - postgres
+      - builder
+    networks:
+      ptl:
+        aliases:
+          - uvicorn
+          - django
+
+  worker:
+    image: ptl
+    build:
+      context: ./src
+      dockerfile: worker.Dockerfile
+      args:
+        env: dev
+    container_name: ptl-worker
+    command: [ "python", "manage.py", "qcluster"]
+    env_file:
+      - dev.env
+    volumes:
+      - "./src:/app"
+      - "./src/config:/etc/certs"
+      - "./src/config/firebase.json:/etc/firebase/firebase.json"
+      - "./src/config/gcp.json:/etc/gcloud/gcp.json"
+    depends_on:
+      - postgres
+      - builder
+    networks:
+      ptl:
+
+#  mysql:
+#    image: ptl-mysql
+#    build:
+#      context: images/mysql
+#    container_name: ptl-db
+#    environment:
+#    - "MYSQL_ROOT_PASSWORD=root"
+#    - "MYSQL_DATABASE=${WP_DB_NAME}"
+#    - "MYSQL_USER=${WP_DB_USER}"
+#    - "MYSQL_PASSWORD=${WP_DB_PASSWORD}"
+#    healthcheck:
+#      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#    networks:
+#      ptl:
+#        aliases:
+#          - db
+#          - mysql
+
+  postgres:
+    image: ptl-postgres
+    build:
+      context: images/postgresql
+    container_name: ptl-postgres
+    environment:
+      POSTGRES_USER: "ptl"
+      POSTGRES_PASSWORD: "ptl"
+      POSTGRES_DB: "ptl"
+    ports:
+      - 5432:5432
+    networks:
+      ptl:
+        aliases:
+          - db
+          - postgres
+          - postgresql
+
+networks:
+  ptl:

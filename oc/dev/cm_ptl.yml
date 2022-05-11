@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ptl
+data:
+  DEBUG: "True"
+  ALLOWED_HOSTS: "ptl.apps.soca.lbdev.etat-ge.ch"
+  DJANGO_LOG_LEVEL: "DEBUG"
+  DJANGO_LOG_FORMAT: "verbose"
+  DJANGO_SETTINGS_MODULE: "ptl.settings_dev"
+  DJANGO_TIMEZONE: "Europe/Zurich"
+  DB_NAME: "ptl"
+  DB_USER: "ptl"
+  DB_HOST: "ptl.ptl.svc.cluster.local"

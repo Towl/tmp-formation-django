@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gunicorn
+data:
+  WORKERS_PER_CORE: "1"
+  MAX_WORKERS: "4"
+  HOST: "0.0.0.0"
+  PORT: "8000"
+  LOG_LEVEL: "info"
+  GRACEFUL_TIMEOUT: "120"
+  TIMEOUT: "120"
+  KEEP_ALIVE: "5"

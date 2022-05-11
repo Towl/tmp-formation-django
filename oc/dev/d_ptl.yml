@@ -1,0 +1,162 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ptl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ptl
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: ptl
+    spec:
+      restartPolicy: Always
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "uvicorn"
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: nginx-cache
+        emptyDir: {}
+      initContainers:
+      - name: migrate
+        image: docker-release.devops.etat-ge.ch/ch/ge/si/ptl/api:VERSION
+        imagePullPolicy: Always
+        command: ["python", "manage.py", "migrate"]
+        envFrom:
+        - configMapRef:
+            name: ptl
+        - secretRef:
+            name: ptl
+        - secretRef:
+            name: postgresql
+        - secretRef:
+            name: gitlab
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            memory: 256Mi
+            cpu: 500m
+        volumeMounts:
+        - mountPath: /data
+          name: data
+          readOnly: False
+      containers:
+      - name: api
+        image: docker-release.devops.etat-ge.ch/ch/ge/si/ptl/api:VERSION
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: ptl
+        - configMapRef:
+            name: gunicorn
+        - secretRef:
+            name: ptl
+        - secretRef:
+            name: postgresql
+        - secretRef:
+            name: gitlab
+        - secretRef:
+            name: awx
+        ports:
+        - containerPort: 8000
+          name: uvicorn
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /admin/login/?liveness
+            port: uvicorn
+            scheme: HTTP
+            httpHeaders:
+            - name: Host
+              value: ptl.apps.soca.lbdev.etat-ge.ch
+            - name: X-Forwarded-Proto
+              value: https
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /admin/login/?readiness
+            port: uvicorn
+            scheme: HTTP
+            httpHeaders:
+            - name: Host
+              value: ptl.apps.soca.lbdev.etat-ge.ch
+            - name: X-Forwarded-Proto
+              value: https
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 30
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: /data
+          name: data
+          readOnly: False
+      - name: nginx
+        image: docker-release.devops.etat-ge.ch/ch/ge/si/ptl/nginx:VERSION
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /nginx_health_check?liveness
+            port: http
+            scheme: HTTP
+            httpHeaders:
+            - name: Host
+              value: ptl.apps.soca.lbdev.etat-ge.ch
+            - name: X-Forwarded-Proto
+              value: https
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /nginx_health_check?readiness
+            port: http
+            scheme: HTTP
+            httpHeaders:
+            - name: Host
+              value: ptl.apps.soca.lbdev.etat-ge.ch
+            - name: X-Forwarded-Proto
+              value: https
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 30
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: /var/cache/nginx
+          name: nginx-cache
+          readOnly: False

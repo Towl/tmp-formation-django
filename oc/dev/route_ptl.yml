@@ -1,0 +1,13 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ptl
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  host: ptl.apps.soca.lbdev.etat-ge.ch
+  to:
+    kind: Service
+    name: ptl
+  tls:
+    termination: edge

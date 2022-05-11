@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: postgresql
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      name: postgresql
+      labels:
+        name: postgresql
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: postgresql
+        envFrom:
+        - configMapRef:
+            name: postgresql
+        - secretRef:
+            name: postgresql
+        image: docker-all.devops.etat-ge.ch/ch/ge/si/ptl/postgresql:13-alpine
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5432
+          name: postgresql
+          protocol: TCP
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            memory: 256Mi
+            cpu: 500m
+        volumeMounts:
+        - mountPath: /certs
+          name: postgresql-server-tls
+          readOnly: True
+        - mountPath: /data
+          name: postgresql-data
+          readOnly: False
+      volumes:
+      - name: postgresql-server-tls
+        secret:
+          secretName: postgresql-server-tls
+          defaultMode: 0400
+          items:
+          - key: ca.crt
+            path: root.crt
+          - key: tls.crt
+            path: server.crt
+          - key: tls.key
+            path: server.key
+      - name: postgresql-data
+        emptyDir: {}

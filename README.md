@@ -1,92 +1,147 @@
-# django
+# Django & Django Rest Framework
+
+Toujours se référer aux documentations officielles:
+
+* [Django](https://docs.djangoproject.com/)
+* [Django Rest Framework](https://www.django-rest-framework.org/)
 
 
+## Initialisation de l'environment
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/tms-software/formation/django.git
-git branch -M main
-git push -uf origin main
+```python
+python -m venv <venv-name>
+source <venv-name>/bin/activate
+pip install -U pip
+pip install -r src/requirements.txt -r src/requirements-dev.txt
 ```
 
-## Integrate with your tools
+## Initialisation d'un projet Django
 
-- [ ] [Set up project integrations](https://gitlab.com/tms-software/formation/django/-/settings/integrations)
+```python
+django-admin startproject <myproject> src
+```
 
-## Collaborate with your team
+### Composition d'un projet Django
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```bash
+src/
+./*.Dockerfile          # Les dockerfiles pour générer les environnements Openshift
+./requirements.txt      # Requirement de prod
+./requirements-dev.txt  # Requirement additionnel pour le dev
+./manage.py             # Point d'entrée Django
+./<myproject>/          # Project Django
+  ./asgi.py             # Point d'entrée config server Asynchrone
+  ./__init__.py         # Un project django est un package python donc __init__.py obligatoire, même vide
+  ./settings.py         # Configuration du projet
+  ./urls.py             # Liste des urls et mapping avec les apps
+  ./wsgi.py             # Point d'entrée config server Syncrhone
+  ./<myfirstapp>/       # Une application spécifique au projet
+  ./<mysecondapp>/      # Une application spécifique au projet
+  ./templates/          # Template spécifique au projet (potentiellement surcharge)
+```
 
-## Test and Deploy
+### Gestion configuration multi-environment
 
-Use the built-in continuous integration in GitLab.
+Le fichier `settings.py` peut-être décomposé à volonté.
+Il est recommandé d'utilisé des fichiers différent pour chaque environment.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Le fichier utilisé par Django est difini par l'env `DJANGO_SETTINGS_MODULE` (cf. [manage.py](./src/manage.py)).
 
-***
+Par exemple, on peut créer un fichier `settings_local.py`:
 
-# Editing this README
+```python
+from .settings_common import *
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+ALLOWED_HOSTS = ["localhost"]
+DEBUG = True
+...
+```
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+De la même façon un fichier pour la prod `settings_prod.py`:
 
-## Name
-Choose a self-explaining name for your project.
+```python
+from .settings_common import *
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+DEBUG = False
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+...
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### Configuration Django
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Confère la [documentation](https://docs.djangoproject.com/en/4.0/topics/settings/) et la [référence](https://docs.djangoproject.com/en/4.0/ref/settings/)
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Voici les plus importantes:
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+* `DEBUG`: C'est un booléan permettant d'activer / désactiver le mode debug de Django. Ce mode fourni énormément d'information en cas d'exception. **A ne surtout pas laisser actif en PROD**.
+* `ALLOWED_HOSTS`: Cette variable contient la liste des domaines authorisés à accéder à l'application (http header Host). Si un domaine n'est pas dans liste, Django retournera une erreur systématiquement.
+* `SECRET_KEY`: Cette variable est une chaîne de caractère aléatoire utilisé pour l'encryption. Il est recommandé d'avoir une valeur différente pour chaque environnement. **Attention a ne jamais changer cette valeur par la suite**.
+* `INSTALLED_APPS`: La liste des applications chargés par le projet. Concrètement le projet Django importera le fichier apps.py de toutes les applications listées ici, dans l'ordre indiqué. **L'ordre est important !** Par ailleurs une application peut être utilisée comme package uniquement. Dans ce cas, elle n'a pas besoin d'être dans la liste.
+* `LOGGING`: Cette variable permet de définir le format et le niveau des logs. Pour plus d'info [la doc](https://docs.djangoproject.com/en/4.0/topics/logging/#configuring-logging)
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Il est important de noter que chaque application peut venir avec son lot de configurations qu'il faudra ajouter aux settings.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## Initialisation d'une application Django
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```bash
+src/myproject/
+django-admin startapp <myapp>
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+### Composition d'une application Django
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+```bash
+src/myproject/myapp/
+./__init__.py     # Une application django est un package python donc __init__.py obligatoire, même vide
+./apps.py         # Point d'entrée de l'application. C'est le fichier qui est chargé par Django si l'application est dans les INSTALLED_APPS
+./models.py       # Peut être nommé différement, contient les models
+./admin.py        # Peut être nommé différement, Contient les models admin
+./tests.py        # Contient les tests, en réalité tous les fichiers tests*.py sont utilisés pour les tests
+./views.py        # Peut être nommé différement, Contient les vues
+./migrations/     # Dossier contenant toutes les migrations de l'application
+  ./__init__.py   # Les migrations sont des packages python donc __init__.py obligatoire, même vide
+```
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Vous pouvez créer autant de fichier que vous le souhaitez. La seule recommandation est de maintenir une cohérence entre le nom du fichier et son contenu.
 
-## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## CLI Django
+
+Le point d'entrée pour toutes les commandes Django est `manage.py`.
+
+```bash
+python src/manage.py
+```
+
+### Initialisation/mise à jour de la DB
+
+```bash
+python src/manage.py makemigrations
+python src/manage.py migrate
+```
+
+### Vérifier l'intégrité du projet
+
+```bash
+python src/manage.py check
+```
+
+### Django Shell
+
+```bash
+python src/manage.py shell
+```
+
+### Lancement du server de dèveloppement
+
+```bash
+python src/manage.py runserver
+```
+
+### Accéder à la DB via Django
+
+```bash
+python src/manage dbshell
+```
+
+# [Next](./doc/README.md)

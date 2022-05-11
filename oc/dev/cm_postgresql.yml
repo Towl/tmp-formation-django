@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql
+data:
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: "ptl"
+  POSTGRES_DB: "ptl"
