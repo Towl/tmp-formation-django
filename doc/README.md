@@ -8,9 +8,9 @@
 
 ## [API (DRF)](./api.md)
 
-## [Queue & Worker](./queue_and_worker.md)
+## [Queue & Worker (Django Q)](./queue_and_worker.md)
 
-## [Tests](./tests.md)
+## [Tests (pytest)](./tests.md)
 
 ## [Admin](./admin.md)
 
