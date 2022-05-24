@@ -1,7 +1,8 @@
 openapi: 3.0.2
 info:
-  title: ''
+  title: PTL
   version: ''
+  description: PTL API
 paths:
   /vms/:
     get:
@@ -344,3 +345,11 @@ components:
       - nom
       - prenom
       - owned_vms
+servers:
+  - url: https://ptl.soca-dev.prod.etat-ge.ch
+    description: Development
+  - url: https://ptl.rec.etat-ge.ch
+    description: Recette
+  - url: https://ptl.prod.etat-ge.ch
+    description: Production
+    
