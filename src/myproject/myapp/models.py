@@ -1,7 +1,13 @@
 from django.db import models
+from django.contrib.auth import models as auth_models
 
 
-class Person(models.Model):
+class PersonManager(auth_models.UserManager):
+    pass
+
+
+class Person(auth_models.User):
+    objects = PersonManager()
     login = models.CharField(max_length=100)
     nom = models.CharField(max_length=200, blank=True, null=True)
     prenom = models.CharField(max_length=200, blank=True, null=True)
@@ -27,6 +33,7 @@ class VM(models.Model):
     cpu = models.PositiveIntegerField(default=0)
     ram = models.PositiveIntegerField(default=0)
     os = models.CharField(max_length=200)
+    locked = models.BooleanField(default=False)
     owner = models.ForeignKey(
         Person, on_delete=models.CASCADE, null=True, related_name="owned_vms"
     )

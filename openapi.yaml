@@ -1,0 +1,346 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /vms/:
+    get:
+      operationId: listVMs
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VM'
+          description: ''
+      tags:
+      - vms
+    post:
+      operationId: createVM
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VM'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VM'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VM'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VM'
+          description: ''
+      tags:
+      - vms
+  /vms/{hostname}/:
+    get:
+      operationId: retrieveVM
+      description: ''
+      parameters:
+      - name: hostname
+        in: path
+        required: true
+        description: A unique value identifying this vm.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VM'
+          description: ''
+      tags:
+      - vms
+    put:
+      operationId: updateVM
+      description: ''
+      parameters:
+      - name: hostname
+        in: path
+        required: true
+        description: A unique value identifying this vm.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VM'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VM'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VM'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VM'
+          description: ''
+      tags:
+      - vms
+    patch:
+      operationId: partialUpdateVM
+      description: ''
+      parameters:
+      - name: hostname
+        in: path
+        required: true
+        description: A unique value identifying this vm.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VM'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VM'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VM'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VM'
+          description: ''
+      tags:
+      - vms
+    delete:
+      operationId: destroyVM
+      description: ''
+      parameters:
+      - name: hostname
+        in: path
+        required: true
+        description: A unique value identifying this vm.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - vms
+  /persons/:
+    get:
+      operationId: listPersons
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - persons
+    post:
+      operationId: createPerson
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Person'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - persons
+  /persons/{id}/:
+    get:
+      operationId: retrievePerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - persons
+    put:
+      operationId: updatePerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Person'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - persons
+    patch:
+      operationId: partialUpdatePerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Person'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - persons
+    delete:
+      operationId: destroyPerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - persons
+components:
+  schemas:
+    VM:
+      type: object
+      properties:
+        url:
+          type: string
+          readOnly: true
+        hostname:
+          type: string
+          maxLength: 200
+        cpu:
+          type: integer
+        ram:
+          type: integer
+        os:
+          type: string
+          maxLength: 200
+        owner:
+          type: object
+          properties:
+            login:
+              type: string
+              maxLength: 100
+            nom:
+              type: string
+              nullable: true
+              maxLength: 200
+            prenom:
+              type: string
+              nullable: true
+              maxLength: 200
+            owned_vms:
+              type: array
+              items:
+                type: string
+          required:
+          - login
+          - nom
+          - prenom
+          - owned_vms
+          readOnly: true
+        owner_id:
+          type: string
+          readOnly: true
+      required:
+      - hostname
+      - os
+    Person:
+      type: object
+      properties:
+        login:
+          type: string
+          maxLength: 100
+        nom:
+          type: string
+          nullable: true
+          maxLength: 200
+        prenom:
+          type: string
+          nullable: true
+          maxLength: 200
+        owned_vms:
+          type: array
+          items:
+            type: string
+      required:
+      - login
+      - nom
+      - prenom
+      - owned_vms
