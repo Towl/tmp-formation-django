@@ -8,7 +8,7 @@
 
 ## [API (DRF)](./api.md)
 
-## [Queue & Worker (Django Q)](./queue_and_worker.md)
+## [Queue & Worker (Django Q & Channels)](./queue_and_worker.md)
 
 ## [Tests (pytest)](./tests.md)
 

@@ -88,6 +88,14 @@ src/myproject/
 django-admin startapp <myapp>
 ```
 
+Attention ceci suit les recommandation de DRF et non pas celle de Django. Une application initialisée de cette façon doit être renommée. Pour cela modifiez le fichier `src/myproject/myapp/apps.py`:
+
+```python
+class MyappConfig(AppConfig):
+    name = "myproject.myapp" # Django aura mis `name = "myapp"` ce qui ne fonctionne pas puisque l'app est installée dans le projet. 
+```
+
+
 ### Composition d'une application Django
 
 ```bash
