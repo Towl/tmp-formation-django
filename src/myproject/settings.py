@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_q",
     "rest_framework",
     "myproject.myapp",
 ]
@@ -150,4 +151,19 @@ LOGGING = {
             "level": "INFO",
         },
     },
+}
+
+Q_CLUSTER = {
+    "name": "queue",
+    "workers": 2,
+    "recycle": 100,
+    "timeout": 3600,
+    "retry": 3601,
+    "compress": True,
+    "save_limit": 100,
+    "queue_limit": 100,
+    "cpu_affinity": 1,
+    "label": "Schedules",
+    "orm": "default",
+    "max_attempts": 1,
 }
